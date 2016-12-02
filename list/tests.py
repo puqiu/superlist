@@ -39,17 +39,17 @@ class HomePageTest(TestCase):
         self.assertEqual(new_item.text, 'a new list item')
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], '/')
+        # self.assertEqual(response['location'], '/')
 
-    def test_home_page_display_all_list_items(self):
-        Item.objects.create(text='itemey 1')
-        Item.objects.create(text='itemey 2')
-
-        request = HttpRequest()
-        response = home_page(request)
-
-        self.assertIn('itemey 1', response.content.decode())
-        self.assertIn('itemey 2', response.content.decode())
+    # def test_home_page_display_all_list_items(self):
+    #     Item.objects.create(text='itemey 1')
+    #     Item.objects.create(text='itemey 2')
+    #
+    #     request = HttpRequest()
+    #     response = home_page(request)
+    #
+    #     self.assertIn('itemey 1', response.content.decode())
+    #     self.assertIn('itemey 2', response.content.decode())
 
 
 class ItemModelTest(TestCase):
@@ -67,3 +67,18 @@ class ItemModelTest(TestCase):
         self.assertEqual(saved_items.count(), 2)
         first_saved_item = saved_items[0]
         self.assertEqual(first_saved_item.text, 'the first list item')
+
+
+class ListViewTest(TestCase):
+
+    def test_display_all_items(self):
+        Item.objects.create(text='itemey 1')
+        Item.objects.create(text='itemey 2')
+        response = self.client.get('/lists/thelist/')
+
+        self.assertContains(response, 'itemey 1')
+        self.assertContains(response, 'itemey 2')
+
+    def test_use_list_template(self):
+        response = self.client.get('/lists/thelist/')
+        self.assertTemplateUsed(response, 'list.html')
